@@ -178,7 +178,6 @@ public class Arbol
     {
         /*if ( datosalas[i][j] ==-1) -> no existe la sala;
         */
-        // TODO estudiantes
         // Crear un árbol binario de búsqueda con los datos de las salas
         // y devolverlo.
         // La raíz del árbol será la sala 0.
@@ -227,7 +226,53 @@ public class Arbol
      */
     public String rutaMejorTesoro ()
     {
-        return null;
+        // Recorrer el árbol en preorden y buscar la ruta con el mejor tesoro
+        // La ruta con el mejor tesoro es aquella que tiene la suma de los tesoros
+        // más alta. Si hay varias rutas con la misma suma, se debe devolver la primera
+        // que se encuentre.
+        // La ruta se debe devolver como una cadena de caracteres con el formato
+        // "Sala 0 -> Sala 1 -> Sala 2 -> ... -> Sala n"
+        // donde n es el número de salas en la ruta.
+        // Si no hay tesoros, se debe devolver "No hay tesoros".
+        // Si la raíz es nula, se debe devolver "No hay tesoros".
+        if ( raiz == null )
+        {
+            return "No hay tesoros";
+        }
+        Stack<NodoArbol> pila = new Stack<> ();
+        ArrayDeque<String> ruta = new ArrayDeque<> ();
+        String mejorRuta = "";
+        int mejorTesoro = 0;
+        int sumaTesoro = 0;
+        pila.push ( raiz );
+        while  ( !pila.isEmpty () )
+        {
+            NodoArbol nodo = pila.pop ();
+            sumaTesoro += nodo.getDato ().getTesoro ();
+            ruta.add ( "Sala " + nodo.getDato ().getId () );
+
+            if ( nodo.getIzquierdo () == null && nodo.getDerecho () == null )
+            {
+            if ( sumaTesoro > mejorTesoro )
+            {
+                mejorTesoro = sumaTesoro;
+                mejorRuta = String.join ( " -> ", ruta );
+            }
+            }
+
+            if ( nodo.getDerecho () != null )
+            {
+                pila.push(nodo.getDerecho());
+            }
+            if ( nodo.getIzquierdo () != null )
+            {
+                pila.push ( nodo.getIzquierdo () );
+            }
+
+            sumaTesoro -= nodo.getDato ().getTesoro ();
+            ruta.removeLast ();
+        }
+        return mejorRuta.isEmpty () ? "No hay tesoros" : mejorRuta;
     }
 
     /**
