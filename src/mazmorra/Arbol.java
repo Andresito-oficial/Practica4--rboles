@@ -2,22 +2,23 @@ package mazmorra;
 
 import java.util.ArrayDeque;
 import java.util.Stack;
+import utilidades.Utilidades;
 
 public class Arbol
 {
     private NodoArbol raiz;
 
-    public Arbol ()
+    private Arbol ()
     {
         raiz = null;
     }
 
-    public Arbol ( Sala dato )
+    private Arbol ( Sala dato )
     {
         raiz = new NodoArbol ( dato );
     }
 
-    public Arbol ( Sala dato, Arbol izquierdo, Arbol derecho )
+    private Arbol ( Sala dato, Arbol izquierdo, Arbol derecho )
     {
         NodoArbol nodoIzq = null;
         NodoArbol nodoDer = null;
@@ -30,6 +31,11 @@ public class Arbol
             nodoDer = derecho.raiz;
         }
         raiz = new NodoArbol ( dato, nodoIzq, nodoDer );
+    }
+
+    private Arbol ( NodoArbol nodo )
+    {
+        raiz = nodo;
     }
 
     /**
@@ -97,14 +103,14 @@ public class Arbol
      */
     public void amplitud ()
     {
-        ArrayDeque<NodoArbol> cola = new ArrayDeque<> ();
+        final ArrayDeque<NodoArbol> cola = new ArrayDeque<> ();
         System.out.print ( "Amplitud: " );
         if ( raiz != null )
         {
             cola.add ( raiz );
             while ( !cola.isEmpty () )
             {
-                NodoArbol nodo = cola.remove ();
+                final NodoArbol nodo = cola.remove ();
                 System.out.print ( nodo.getDato () + "  " );
                 if ( nodo.getIzquierdo () != null ) 
                 {
@@ -125,18 +131,18 @@ public class Arbol
      */
     public void amplitudConNiveles ()
     {
-        ArrayDeque<NodoArbol> cola = new ArrayDeque<NodoArbol> ();
-        ArrayDeque<Integer> colaNiveles = new ArrayDeque<> ();
+        final ArrayDeque<NodoArbol> cola = new ArrayDeque<NodoArbol> ();
+        final ArrayDeque<Integer> colaNiveles = new ArrayDeque<Integer> ();
         System.out.println ( "Amplitud con niveles: " );
-        int nivel = 1;
+        final int nivel = 1;
         if ( raiz != null )
         {
             cola.add ( raiz );
             colaNiveles.add ( nivel );
             while ( !cola.isEmpty () )
             {
-                NodoArbol nodo = cola.remove ();
-                int n = colaNiveles.remove ();
+                final NodoArbol nodo = cola.remove ();
+                final int n = colaNiveles.remove ();
                 System.out.println ( "Nivel " + n + ": " + nodo.getDato () );
                 if ( nodo.getIzquierdo () != null )
                 {
@@ -176,49 +182,37 @@ public class Arbol
      */
     public static Arbol construirMazmorra ( int[][] datosSalas )
     {
-        /*if ( datosalas[i][j] ==-1) -> no existe la sala;
-        */
-        // Crear un árbol binario de búsqueda con los datos de las salas
-        // y devolverlo.
-        // La raíz del árbol será la sala 0.
-        // Las salas se numeran de 0 a n-1, donde n es el número de salas.
-        // La sala i tiene como hijo izquierdo la sala 2*i+1 y como hijo derecho la sala 2*i+2.
-        // Si la sala i no tiene hijo izquierdo o derecho, se debe poner -1 en su lugar.
+        /*
+         * Si la matriz es nula o esta vaciá, se devuelve un elemento nulo.
+         * En cualquier otro caso, se devuelve un árbol construida de la siguiente manera:
+         * 1. Se crea un array de nodos de tamaño n+2, donde n es el número de filas de la matriz.
+         * 2. Se inicializan los dos primeros nodos como nulos. De esta manera, cuando un nodo apunta a otro nodo
+         *    (como noodo izquierdo o derecho) utilizando el índice -1, se le puede dar el valor nulo almacenado en la posición 0
+         *    del array (-1 + 1 = 0 ).
+         * 3. Se recorre la matriz de abajo hacia arriba, creando un nodo para cada sala y asignando los nodos izquierdo y derecho
+         *    correspondientes a los valores ubicados en la fila correspondiente al nodo actual y la columna 1 (nodo izquierdo) o la columna 2
+         *    (nodo derecho) de la matriz.
+         *    Cada nodo está formado por una sala (con id, que es el número de línea que ocupa el nodo en el fichero .txt que contiene la mazmorra
+         *    y valor, el cual es el valor almacenado en la columna 3 de la fila que ocupa el nodo en la matriz ) y las referencias a los nodos izquierdo y derecho.
+         * Finalmente, se devuelve el árbol construido a partir del nodo raíz, que es el nodo 2 del array (nodo ubicado en la primera fila de la matriz).
+         */
 
         if ( datosSalas == null || datosSalas.length == 0 )
         {
             return null;
         }
 
-        NodoArbol[] nodos = new NodoArbol [ datosSalas.length ];
-        for ( int i = 0; i < datosSalas.length; i++ )
+        final NodoArbol[] nodos = new NodoArbol [ datosSalas.length + 2 ];
+        nodos[0] = nodos[1] = null;
+        for ( int i = datosSalas.length - 1; i >= 0; i-- )
         {
-            if ( datosSalas[i][0] != -1 )
-            {
-            nodos[i] = new NodoArbol ( new Sala ( datosSalas[i][0] ) );
-            }
+            final int indiceIzquierdo = datosSalas[i][0] + 2;
+            final int indicederecho = datosSalas[i][1] + 2;
+            final int valor = datosSalas[i][2];
+            final Sala sala = new Sala ( i + 1, valor );
+            nodos[i + 2] = new NodoArbol ( sala, nodos[indiceIzquierdo], nodos[indicederecho] );
         }
-
-        for ( int i = 0; i < datosSalas.length; i++ )
-        {
-            if ( nodos[i] != null )
-            {
-            int hijoIzquierdo = 2 * i + 1;
-            int hijoDerecho = 2 * i + 2;
-
-            if ( hijoIzquierdo < datosSalas.length && datosSalas[hijoIzquierdo][0] != -1 )
-            {
-                nodos[i].setIzquierdo ( nodos[hijoIzquierdo] );
-            }
-
-            if ( hijoDerecho < datosSalas.length && datosSalas[hijoDerecho][0] != -1 )
-            {
-                nodos[i].setDerecho ( nodos[hijoDerecho] );
-            }
-            }
-        }
-
-        return new Arbol ( nodos[0].getDato (), null, null );
+        return new Arbol ( nodos[2]);
     }
 
     /**
@@ -235,44 +229,75 @@ public class Arbol
         // donde n es el número de salas en la ruta.
         // Si no hay tesoros, se debe devolver "No hay tesoros".
         // Si la raíz es nula, se debe devolver "No hay tesoros".
-        if ( raiz == null )
+
+        //si tesoroDerecha < tesoroIzquierda, entonces se añade la ruta de la izquierda
+        //si tesoroIzquierda < tesoroDerecha, entonces se añade la ruta de la derecha
+        //si tesoroIzquierda == tesoroDerecha, entonces se añade la ruta de la izquierda
+        //si tesoroIzquierda == 0 && tesoroDerecha == 0, entonces se añade la ruta de la izquierda
+        //hay que añadir al string la ruta seleccionada en cada disyunción
+        
+
+        //si la raíz no tiene nodos izuquierdo y derecho, se devuelve el valor de la raíz.
+        final String inicio = "-> ";
+        final Ruta ruta = rutaMejorTesoro ( raiz );
+        final String rutaStr = inicio + ruta.ruta + "(" + ruta.valor + ") X";
+        return rutaStr;
+    }
+    
+    final char[] direcciones = { Utilidades.getGiroDerecha (), Utilidades.getGiroIzquierda (), Utilidades.getLineaRecta () };
+    final int derecha = 0;
+    final int izquierda = 1;
+    final int recta = 2;
+
+    private Ruta rutaMejorTesoro ( NodoArbol nodo )
+    {
+        if ( nodo == null )
         {
-            return "No hay tesoros";
+            return null;
         }
-        Stack<NodoArbol> pila = new Stack<> ();
-        ArrayDeque<String> ruta = new ArrayDeque<> ();
-        String mejorRuta = "";
-        int mejorTesoro = 0;
-        int sumaTesoro = 0;
-        pila.push ( raiz );
-        while  ( !pila.isEmpty () )
+
+        final Ruta rutaIzquierda = rutaMejorTesoro ( nodo.getIzquierdo () );
+        final Ruta rutaDerecha = rutaMejorTesoro ( nodo.getDerecho () );
+
+        if ( rutaIzquierda == null && rutaDerecha == null )
         {
-            NodoArbol nodo = pila.pop ();
-            sumaTesoro += nodo.getDato ().getTesoro ();
-            ruta.add ( "Sala " + nodo.getDato ().getId () );
-
-            if ( nodo.getIzquierdo () == null && nodo.getDerecho () == null )
-            {
-            if ( sumaTesoro > mejorTesoro )
-            {
-                mejorTesoro = sumaTesoro;
-                mejorRuta = String.join ( " -> ", ruta );
-            }
-            }
-
-            if ( nodo.getDerecho () != null )
-            {
-                pila.push(nodo.getDerecho());
-            }
-            if ( nodo.getIzquierdo () != null )
-            {
-                pila.push ( nodo.getIzquierdo () );
-            }
-
-            sumaTesoro -= nodo.getDato ().getTesoro ();
-            ruta.removeLast ();
+            return new Ruta ( "" + nodo.getDato ().getId (), nodo.getDato ().getValor () );
         }
-        return mejorRuta.isEmpty () ? "No hay tesoros" : mejorRuta;
+        else if ( rutaIzquierda == null ) 
+        {
+            return new Ruta ( nodo.getDato ().getId () + " " + direcciones[recta] + " " + rutaDerecha.ruta + " ",
+                    rutaDerecha.valor );
+        }
+        else if ( rutaDerecha == null )
+        {
+            return new Ruta ( nodo.getDato ().getId () + direcciones[recta] + rutaIzquierda.ruta,
+                    rutaIzquierda.valor );
+        }
+        else
+        {
+            if ( rutaIzquierda.valor > rutaDerecha.valor )
+            {
+                return new Ruta ( nodo.getDato ().getId () + direcciones[izquierda] + rutaIzquierda.ruta,
+                        rutaIzquierda.valor );
+            }
+            else
+            {
+                return new Ruta ( nodo.getDato ().getId () + direcciones[derecha] + rutaDerecha.ruta,
+                        rutaDerecha.valor );
+            }
+        }
+    }
+
+    private class Ruta
+    {
+        public final String ruta;
+        public final int valor;
+
+        public Ruta ( String ruta, int valor )
+        {
+            this.ruta = ruta;
+            this.valor = valor;
+        }
     }
 
     /**

@@ -56,7 +56,7 @@ public class ArbolBinarioBusqueda
 
 	public boolean insertar ( int clave, Sala dato )
 	{
-		int previousNumElementos = numElementos;
+		final int previousNumElementos = numElementos;
 		raiz = this.insertarRec ( raiz, clave, dato );
 		return ( previousNumElementos < numElementos );
 	}
@@ -88,7 +88,7 @@ public class ArbolBinarioBusqueda
 
 	public boolean borrar ( int clave )
 	{
-		int previousNumElementos = numElementos;
+		final int previousNumElementos = numElementos;
 		raiz = this.borrarRec ( raiz, clave );
 		return ( numElementos < previousNumElementos );
 	}
@@ -134,56 +134,70 @@ public class ArbolBinarioBusqueda
 		return nodo;
 	}
 
-	private NodoArbolBinarioBusqueda cambiarPorMenor(NodoArbolBinarioBusqueda nodoBorrar, NodoArbolBinarioBusqueda nodoMenor) {
-		if (nodoMenor.getDerecho() != null) {   // Subárbol derecho
-			NodoArbolBinarioBusqueda nuevoDer = this.cambiarPorMenor(nodoBorrar, nodoMenor.getDerecho());
-			nodoMenor.setDerecho(nuevoDer);
+	private NodoArbolBinarioBusqueda cambiarPorMenor ( NodoArbolBinarioBusqueda nodoBorrar, NodoArbolBinarioBusqueda nodoMenor )
+	{
+		if ( nodoMenor.getDerecho () != null )
+		{   // Subárbol derecho
+			NodoArbolBinarioBusqueda nuevoDer = this.cambiarPorMenor ( nodoBorrar, nodoMenor.getDerecho () );
+			nodoMenor.setDerecho ( nuevoDer );
 			return nodoMenor;
-		} else {  // Encontrado nodo menor inmediato
-			nodoBorrar.setClave(nodoMenor.getClave()); // Cambiar datos
-			nodoBorrar.setDato(nodoMenor.getDato());
-			return nodoMenor.getIzquierdo();
+		}
+		else
+		{  // Encontrado nodo menor inmediato
+			nodoBorrar.setClave ( nodoMenor.getClave () ); // Cambiar datos
+			nodoBorrar.setDato ( nodoMenor.getDato () );
+			return nodoMenor.getIzquierdo ();
 			// Devolver subarbol izquierdo de menor inmediato
 		}
 	}
 
 	
-	private NodoArbolBinarioBusqueda rotarDerecha(NodoArbolBinarioBusqueda nodo) {
+	private NodoArbolBinarioBusqueda rotarDerecha ( NodoArbolBinarioBusqueda nodo )
+	{
 		NodoArbolBinarioBusqueda res = null;
-		if (nodo != null) {
-			NodoArbolBinarioBusqueda temp = nodo.getIzquierdo();
-			if (temp == null) res = nodo;
-			else {
-				nodo.setIzquierdo(temp.getDerecho());
-				temp.setDerecho(nodo);
+		if ( nodo != null )
+		{
+			NodoArbolBinarioBusqueda temp = nodo.getIzquierdo ();
+			if ( temp == null ) res = nodo;
+			else
+			{
+				nodo.setIzquierdo ( temp.getDerecho () );
+				temp.setDerecho ( nodo );
 				res = temp;
 			}
 		}
 		return res;
 	}
 
-	private NodoArbolBinarioBusqueda rotarIzquierda(NodoArbolBinarioBusqueda nodo) {
+	private NodoArbolBinarioBusqueda rotarIzquierda ( NodoArbolBinarioBusqueda nodo )
+	{
 		NodoArbolBinarioBusqueda res = null;
-		if (nodo != null) {
-			NodoArbolBinarioBusqueda temp = nodo.getDerecho();
-			if (temp == null) {
+		if ( nodo != null )
+		{
+			NodoArbolBinarioBusqueda temp = nodo.getDerecho ();
+			if ( temp == null )
+			{
 				res = nodo;
-			} else {
-				nodo.setDerecho(temp.getIzquierdo());
-				temp.setIzquierdo(nodo);
+			}
+			else
+			{
+				nodo.setDerecho ( temp.getIzquierdo () );
+				temp.setIzquierdo ( nodo );
 				res = temp;
 			}
 		}
 		return res;
 	}
 
-	private int altura(NodoArbolBinarioBusqueda nodo) {
+	private int altura ( NodoArbolBinarioBusqueda nodo )
+	{
 		int res ;
-		if (nodo == null) res = 0;
-		else {
-			int aIzq = this.altura(nodo.getIzquierdo());
-			int aDech = this.altura(nodo.getDerecho());
-			res = Math.max(aIzq, aDech) + 1;
+		if ( nodo == null ) res = 0;
+		else
+		{
+			int aIzq = this.altura ( nodo.getIzquierdo () );
+			int aDech = this.altura ( nodo.getDerecho () );
+			res = Math.max ( aIzq, aDech ) + 1;
 		}
 		return res;
 	}
@@ -191,20 +205,35 @@ public class ArbolBinarioBusqueda
 	/**
 	 * TODO estudiantes
 	 */
+	@Override
 	public String toString() {
-		return null;
+		StringBuilder sb = new StringBuilder();
+		toStringRec(raiz, sb, 1);
+		return sb.toString();
+	}
+
+	private void toStringRec(NodoArbolBinarioBusqueda nodo, StringBuilder sb, int nivel) {
+		if (nodo != null) {
+			toStringRec(nodo.getIzquierdo(), sb, nivel + 1);
+			sb.append("Sala ").append(nodo.getClave())
+			  .append(": Valor(").append(nodo.getDato().getValor()).append(") ")
+			  .append("[Nivel ").append(nivel).append("]\n");
+			toStringRec(nodo.getDerecho(), sb, nivel + 1);
+		}
 	}
 
 	/**
 	 * TODO estudiantes
 	 */
-	public void mostrar2D() {
+	public void mostrar2D ()
+	{
 	}
 
 	/**
 	 * TODO estudiantes
 	 */
-	public ArbolBinarioBusqueda[] partir(int clave) {
+	public ArbolBinarioBusqueda[] partir ( int clave )
+	{
 		return null;
 	}
 
