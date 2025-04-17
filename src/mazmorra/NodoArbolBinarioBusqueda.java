@@ -5,6 +5,7 @@ public class NodoArbolBinarioBusqueda
 
 	private int clave;
 	private Sala dato;
+	private int altura;
 	private NodoArbolBinarioBusqueda izquierdo, derecho;
 
 	public NodoArbolBinarioBusqueda ( int clave, Sala dato )
@@ -13,6 +14,7 @@ public class NodoArbolBinarioBusqueda
 		this.dato = dato;
 		this.izquierdo = null;
 		this.derecho = null;
+		altura = 1;
 	}
 
 	public Sala getDato () { return dato; }
@@ -31,4 +33,22 @@ public class NodoArbolBinarioBusqueda
 
 	public void setDerecho ( NodoArbolBinarioBusqueda derecho ) { this.derecho = derecho;}
 
+	public int getAltura () { return altura; }
+
+	public static int getAltura ( NodoArbolBinarioBusqueda nodo )
+	{
+		if ( nodo == null )
+		{
+			return 0;
+		}
+		else
+		{
+			return nodo.altura;
+		}
+	}
+	
+	public void recalcularAltura ()
+	{
+		altura = Math.max ( getAltura ( izquierdo ), getAltura ( derecho ) ) + 1;
+	}
 }

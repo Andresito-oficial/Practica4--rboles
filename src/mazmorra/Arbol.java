@@ -273,30 +273,35 @@ public class Arbol
             return new Ruta ( nodo.getDato ().getId () + direcciones[recta] + rutaIzquierda.ruta,
                     rutaIzquierda.valor );
         }
+        else if ( rutaIzquierda.valor > rutaDerecha.valor )
+        {
+            return new Ruta ( nodo.getDato ().getId () + direcciones[izquierda] + rutaIzquierda.ruta,
+            rutaIzquierda.valor );
+        }
         else
         {
-            if ( rutaIzquierda.valor > rutaDerecha.valor )
-            {
-                return new Ruta ( nodo.getDato ().getId () + direcciones[izquierda] + rutaIzquierda.ruta,
-                        rutaIzquierda.valor );
-            }
-            else
-            {
-                return new Ruta ( nodo.getDato ().getId () + direcciones[derecha] + rutaDerecha.ruta,
-                        rutaDerecha.valor );
-            }
+            return new Ruta ( nodo.getDato ().getId () + direcciones[derecha] + rutaDerecha.ruta,
+            rutaDerecha.valor );
         }
+        
     }
 
     private class Ruta
     {
         public final String ruta;
         public final int valor;
-
+        public final int dificultad;
         public Ruta ( String ruta, int valor )
         {
             this.ruta = ruta;
             this.valor = valor;
+            dificultad = 0;
+        }
+        public Ruta ( String ruta, int valor, int dificultad )
+        {
+            this.ruta = ruta;
+            this.valor = valor;
+            this.dificultad = dificultad;
         }
     }
 
@@ -305,15 +310,62 @@ public class Arbol
      */
     public String rutaMasFacil ()
     {
-        
-        return null;
+        //recorrer los nodos y al llegar a una hoja, empezar a construir la ruta
+        //para poder obtener el valor de la hoja habrá que meterla en una estructura de datos aux.
+        //para devolver se tendrá que consturir la cadena de caracteres empleando la forma id del nodo actual +
+        //el nivel del monstruo en esa sala (si lo hay) entre corchetes + el giro correspondiente a la dirección 
+        //del nodo elegido como siguiente + la ruta del nodo elegido como siguiente
+        final String inicio = "-> ";
+        final Ruta ruta = rutaMasFacil ( raiz );
+        final String rutaStr = inicio + ruta.ruta + "(" + ruta.valor + ") X";
+        return rutaStr;
     }
 
+    private Ruta rutaMasFacil ( NodoArbol nodo )
+    {
+        if ( nodo == null )
+        {
+            return null;
+        }
+
+        final Ruta rutaIzquierda = rutaMasFacil ( nodo.getIzquierdo () );
+        final Ruta rutaDerecha = rutaMasFacil ( nodo.getDerecho () );
+
+        if ( rutaIzquierda == null && rutaDerecha == null )
+        {
+            return new Ruta ( "" + nodo.getDato ().getId (), nodo.getDato ().getValor () );
+        }
+        else if ( rutaIzquierda == null ) 
+        {
+            return new Ruta ( nodo.getDato ().getId () + "[" + nodo.getDato ().getValor () +  "] " + direcciones[recta] + rutaDerecha.ruta + " ",
+                    rutaDerecha.valor, rutaDerecha.dificultad + nodo.getDato ().getValor () );
+        }
+        else if ( rutaDerecha == null )
+        {
+            return new Ruta ( nodo.getDato ().getId () + "[" + nodo.getDato ().getValor () + "] " + direcciones[recta] + rutaIzquierda.ruta + " ",
+                    rutaIzquierda.valor, rutaIzquierda.dificultad + nodo.getDato ().getValor () );
+        }
+        else if ( rutaIzquierda.dificultad < rutaDerecha.dificultad )
+        {
+            return new Ruta ( nodo.getDato ().getId () + "[" + nodo.getDato ().getValor () + "] " + direcciones[izquierda] + rutaIzquierda.ruta + " ",
+            rutaIzquierda.valor, rutaIzquierda.dificultad + nodo.getDato ().getValor () );
+        }
+        else
+        {
+            return new Ruta ( nodo.getDato ().getId () + "["  + nodo.getDato ().getValor () + "] " + direcciones[derecha] + rutaDerecha.ruta + " ",
+            rutaDerecha.valor, rutaDerecha.dificultad + nodo.getDato ().getValor () );
+        }
+    }
+    
     /**
      * TODO estudiantes
      */
     public ArbolBinarioBusqueda abbMonstruos ()
     {
+        // Recorrer el árbol en preorden y buscar los monstruos
+        // Si el nodo no es una hoja y su sala no está vacía, se añade a la lista de monstruos
+        // y se recorre el subárbol izquierdo y derecho
+        
         return null;
     }
 
@@ -323,7 +375,10 @@ public class Arbol
      */
     public ArbolBinarioBusqueda abbTesoros ()
     {
+        // Recorrer el árbol en preorden y buscar los tesoros
+        
         return null;
+
     }
 
 }

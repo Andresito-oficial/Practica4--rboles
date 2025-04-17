@@ -1,5 +1,7 @@
 package mazmorra;
 
+import java.util.ArrayDeque;
+
 public class ArbolBinarioBusqueda
 {
 	private NodoArbolBinarioBusqueda raiz;
@@ -82,7 +84,32 @@ public class ArbolBinarioBusqueda
 		{      // Clave repetida
 			System.out.println ( "Error. La clave " + clave + " ya existe" );
 		}
-		return nodo;    // Devolver la nueva raíz del subárbol
+		return reequilibrar ( nodo );    // Devolver la nueva raíz del subárbol
+	}
+
+	private NodoArbolBinarioBusqueda reequilibrar ( NodoArbolBinarioBusqueda nodo )
+	{
+		final NodoArbolBinarioBusqueda nodoIzq = nodo.getIzquierdo();
+		final NodoArbolBinarioBusqueda nodoDer = nodo.getDerecho();
+		int aIzq = NodoArbolBinarioBusqueda.getAltura( nodoIzq );
+		final int aDer = NodoArbolBinarioBusqueda.getAltura( nodoDer );
+		
+		if ( aIzq > aDer + 1 )
+		{  // Rotar derecha
+			nodo = rotarDerecha( nodo );
+		}
+		else if ( aDer > aIzq + 1 || nodoIzq == null && nodoDer != null )
+		{  // Rotar izquierda
+			nodo = rotarIzquierda( nodo );
+		}
+		nodo.recalcularAltura();
+
+		/*
+		 * if ( nodoDer != null && nodoIzq == null ) nodo.setIzquierdo ( rotarIzquierda ( nodo ) );
+		 * else if ( aIzq > aDer + 1 ) nodo = rotarDerecha ( nodo );
+		 * else if ( aDer > aIzq + 1 ) nodo = rotarIzquierda ( nodo );
+		 */
+		return nodo;
 	}
 
 
@@ -157,12 +184,13 @@ public class ArbolBinarioBusqueda
 		NodoArbolBinarioBusqueda res = null;
 		if ( nodo != null )
 		{
-			NodoArbolBinarioBusqueda temp = nodo.getIzquierdo ();
+			NodoArbolBinarioBusqueda temp = nodo.getIzquierdo();
 			if ( temp == null ) res = nodo;
 			else
 			{
-				nodo.setIzquierdo ( temp.getDerecho () );
-				temp.setDerecho ( nodo );
+				nodo.setIzquierdo( temp.getDerecho() );
+				temp.setDerecho( nodo );
+				nodo.recalcularAltura();
 				res = temp;
 			}
 		}
@@ -183,6 +211,7 @@ public class ArbolBinarioBusqueda
 			{
 				nodo.setDerecho ( temp.getIzquierdo () );
 				temp.setIzquierdo ( nodo );
+				nodo.recalcularAltura ();
 				res = temp;
 			}
 		}
@@ -206,19 +235,22 @@ public class ArbolBinarioBusqueda
 	 * TODO estudiantes
 	 */
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		toStringRec(raiz, sb, 1);
-		return sb.toString();
+	public String toString ()
+	{
+		StringBuilder sb = new StringBuilder ();
+		toStringRec ( raiz, sb, 1 );
+		return sb.toString ();
 	}
 
-	private void toStringRec(NodoArbolBinarioBusqueda nodo, StringBuilder sb, int nivel) {
-		if (nodo != null) {
-			toStringRec(nodo.getIzquierdo(), sb, nivel + 1);
-			sb.append("Sala ").append(nodo.getClave())
-			  .append(": Valor(").append(nodo.getDato().getValor()).append(") ")
-			  .append("[Nivel ").append(nivel).append("]\n");
-			toStringRec(nodo.getDerecho(), sb, nivel + 1);
+	private void toStringRec ( NodoArbolBinarioBusqueda nodo, StringBuilder sb, int nivel )
+	{
+		if ( nodo != null )
+		{
+			toStringRec ( nodo.getIzquierdo(), sb, nivel + 1 );
+			sb.append ("Sala ").append ( nodo.getDato().getId() )
+			  .append (": Valor(" ).append ( nodo.getClave() ).append (") " )
+			  .append ("[Nivel " ).append ( nivel ).append ("]\n" );
+			toStringRec ( nodo.getDerecho(), sb, nivel + 1 );
 		}
 	}
 
@@ -227,6 +259,39 @@ public class ArbolBinarioBusqueda
 	 */
 	public void mostrar2D ()
 	{
+		final ArrayDeque<NodoArbolBinarioBusqueda> cola = new ArrayDeque<NodoArbolBinarioBusqueda> ();
+        final ArrayDeque<Integer> colaNiveles = new ArrayDeque<Integer> ();
+		final int nivel = 1;
+		final int altura = altura(raiz);
+		if ( raiz != null )
+        {
+			int nivelAnterior;
+			nivelAnterior = 0;
+            cola.add ( raiz );
+            colaNiveles.add ( nivel );
+            while ( !cola.isEmpty () )
+            {
+                final NodoArbolBinarioBusqueda nodo = cola.remove ();
+                final int n = colaNiveles.remove ();
+				int nEspacios = (int) Math.pow ( 2, altura - n + 2 );
+                System.out.print ( " ".repeat(nEspacios) + nodo.getClave() );
+                if ( nodo.getIzquierdo () != null )
+                {
+                    cola.add ( nodo.getIzquierdo () );
+                    colaNiveles.add ( n+1 );
+                }
+                if ( nodo.getDerecho () != null )
+                {
+                    cola.add ( nodo.getDerecho () );
+                    colaNiveles.add ( n+1 );
+                }
+				if ( n > nivelAnterior )
+				{
+					System.out.println ();
+					nivelAnterior = n;
+				}
+            }
+        }
 	}
 
 	/**
@@ -234,6 +299,20 @@ public class ArbolBinarioBusqueda
 	 */
 	public ArbolBinarioBusqueda[] partir ( int clave )
 	{
+		/*
+		final ArbolBinarioBusqueda[] resultado = new ArbolBinarioBusqueda[2];
+		final Sala corte = this.getElementoRec ( raiz, clave );
+		final NodoArbolBinarioBusqueda nodo = new NodoArbolBinarioBusqueda ( clave, corte );
+		if ( nodo != null )
+		{
+			resultado[0] = new ArbolBinarioBusqueda ();
+			resultado[1] = new ArbolBinarioBusqueda ();
+			resultado[0].raiz = nodo.getIzquierdo ();
+			resultado[1].raiz = nodo.getDerecho ();
+			resultado[0].numElementos = this.numElementos;
+			resultado[1].numElementos = this.numElementos;
+		}
+		*/
 		return null;
 	}
 
