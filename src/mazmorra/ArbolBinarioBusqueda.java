@@ -262,10 +262,11 @@ public class ArbolBinarioBusqueda
 		final ArrayDeque<NodoArbolBinarioBusqueda> cola = new ArrayDeque<NodoArbolBinarioBusqueda> ();
         final ArrayDeque<Integer> colaNiveles = new ArrayDeque<Integer> ();
 		final int nivel = 1;
-		final int altura = altura(raiz);
+		final int altura = altura(raiz); 
 		if ( raiz != null )
         {
 			int nivelAnterior;
+			final NodoArbolBinarioBusqueda nulo = new NodoArbolBinarioBusqueda ( -1, null );
 			nivelAnterior = 0;
             cola.add ( raiz );
             colaNiveles.add ( nivel );
@@ -274,23 +275,42 @@ public class ArbolBinarioBusqueda
                 final NodoArbolBinarioBusqueda nodo = cola.remove ();
                 final int n = colaNiveles.remove ();
 				int nEspacios = (int) Math.pow ( 2, altura - n + 2 );
-                System.out.print ( " ".repeat(nEspacios) + nodo.getClave() );
-                if ( nodo.getIzquierdo () != null )
-                {
-                    cola.add ( nodo.getIzquierdo () );
-                    colaNiveles.add ( n+1 );
-                }
-                if ( nodo.getDerecho () != null )
-                {
-                    cola.add ( nodo.getDerecho () );
-                    colaNiveles.add ( n+1 );
-                }
 				if ( n > nivelAnterior )
 				{
 					System.out.println ();
 					nivelAnterior = n;
+					System.out.printf("%-" + nEspacios/2 + "s", " " );
 				}
+				
+				if ( nodo != nulo )
+				{
+					System.out.printf("%-" + nEspacios + "s", nodo.getClave() );
+					if ( nodo.getIzquierdo() != null)
+					{
+						cola.add ( nodo.getIzquierdo () );
+					}
+					else
+					{
+						cola.add ( nulo );
+					}
+                   	colaNiveles.add ( n+1 );
+					if ( nodo.getDerecho() != null)
+					{
+						cola.add ( nodo.getDerecho () );
+					}
+					else
+					{
+						cola.add ( nulo );
+					}
+                   	colaNiveles.add ( n+1 );
+				}
+				else
+				{
+					System.out.printf("%-" + nEspacios + "s", " " );
+				}
+				
             }
+			System.out.println ();
         }
 	}
 
@@ -299,9 +319,8 @@ public class ArbolBinarioBusqueda
 	 */
 	public ArbolBinarioBusqueda[] partir ( int clave )
 	{
-		/*
 		final ArbolBinarioBusqueda[] resultado = new ArbolBinarioBusqueda[2];
-		final Sala corte = this.getElementoRec ( raiz, clave );
+		/* final Sala corte = this.getElementoRec ( raiz, clave );
 		final NodoArbolBinarioBusqueda nodo = new NodoArbolBinarioBusqueda ( clave, corte );
 		if ( nodo != null )
 		{
@@ -311,9 +330,40 @@ public class ArbolBinarioBusqueda
 			resultado[1].raiz = nodo.getDerecho ();
 			resultado[0].numElementos = this.numElementos;
 			resultado[1].numElementos = this.numElementos;
+		} */
+		resultado[0] = new ArbolBinarioBusqueda ();
+		resultado[1] = new ArbolBinarioBusqueda ();
+		if ( raiz != null )
+		{
+			partirRec ( raiz, clave, resultado );
+
+			return resultado;
 		}
-		*/
-		return null;
+		else
+		{
+			System.out.println ( "El árbol está vacío" );
+			return null;
+		}
 	}
+
+	private void partirRec ( NodoArbolBinarioBusqueda nodo, int clave, ArbolBinarioBusqueda[] resultado )
+	{
+		if ( nodo != null )
+		{
+			if ( nodo.getClave () < clave )
+			{
+				resultado[0].insertar ( nodo.getClave (), nodo.getDato () );
+				
+			}
+			else if ( nodo.getClave () > clave )
+			{
+				resultado[1].insertar ( nodo.getClave (), nodo.getDato () );
+				
+			}
+			partirRec ( nodo.getIzquierdo (), clave, resultado );
+			partirRec ( nodo.getDerecho (), clave, resultado );
+		}
+	}
+
 
 }
