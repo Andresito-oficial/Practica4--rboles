@@ -202,7 +202,7 @@ public class Arbol
             return null;
         }
 
-        final NodoArbol[] nodos = new NodoArbol [ datosSalas.length + 2 ];
+        final NodoArbol[] nodos = new NodoArbol [ datosSalas.length + 3 ];
         nodos[0] = nodos[1] = null;
         for ( int i = datosSalas.length - 1; i >= 0; i-- )
         {
@@ -211,6 +211,7 @@ public class Arbol
             final int valor = datosSalas[i][2];
             final Sala sala = new Sala ( i + 1, valor );
             nodos[i + 2] = new NodoArbol ( sala, nodos[indiceIzquierdo], nodos[indicederecho] );
+            System.out.println( "Procesando línea " + (i + 1) );
         }
         return new Arbol ( nodos[2]);
     }
@@ -365,8 +366,41 @@ public class Arbol
         // Recorrer el árbol en preorden y buscar los monstruos
         // Si el nodo no es una hoja y su sala no está vacía, se añade a la lista de monstruos
         // y se recorre el subárbol izquierdo y derecho
-        
-        return null;
+        //la clave de cada nodo es el id del monstruo
+        //el arbol binario de búsqueda se construye a partir de los nodos que contienen monstruos
+        ArbolBinarioBusqueda arbol = new ArbolBinarioBusqueda ();
+        abbMonstruos ( raiz, arbol );
+        return arbol;
+    }
+
+    private void abbMonstruos ( NodoArbol nodo, ArbolBinarioBusqueda arbol )
+    {
+        //si el nodo es nulo, se devuelve el árbol binario de búsqueda
+        //si el nodo no es nulo, se comprueba si la sala está vacía
+        //si la sala no está vacía, se añade el nodo a la lista de monstruos
+        //y se recorre el subárbol izquierdo y derecho
+        if ( nodo.getIzquierdo() != null || nodo.getDerecho() != null )
+        {
+            final int valor = nodo.getDato().getValor();
+            if ( valor != 0 )
+            {
+                //se añade el nodo a la lista de monstruos
+                arbol.insertar ( valor, nodo.getDato() );
+                System.out.println ( arbol.toString());
+            }
+            if ( nodo.getIzquierdo () != null )
+            {
+                abbMonstruos ( nodo.getIzquierdo(), arbol );
+            }
+            if ( nodo.getDerecho() != null )
+            {
+                abbMonstruos ( nodo.getDerecho(), arbol );
+            }
+        }
+     
+        //si el nodo no es una hoja y su sala no está vacía, se añade a la lista de monstruos
+        //y se recorre el subárbol izquierdo y derecho
+       
     }
 
     /**
@@ -376,9 +410,36 @@ public class Arbol
     public ArbolBinarioBusqueda abbTesoros ()
     {
         // Recorrer el árbol en preorden y buscar los tesoros
+        // Si el nodo no es una hoja y su sala no está vacía, se añade a la lista de tesoros
+        // y se recorre el subárbol izquierdo y derecho
+        //la clave de cada nodo es el id del tesoro
+        //el arbol binario de búsqueda se construye a partir de los nodos que contienen tesoros
+        //si la raíz es nula, se devuelve un árbol nulo
+        //si la raíz no es nula, se devuelve un árbol binario de búsqueda construido a partir
+        //de los nodos que contienen tesoros
         
         return null;
 
     }
+
+    @Override
+	public String toString ()
+	{
+		StringBuilder sb = new StringBuilder ();
+		toStringRec ( raiz, sb, 1 );
+		return sb.toString ();
+	}
+
+	private void toStringRec ( NodoArbol nodo, StringBuilder sb, int nivel )
+	{
+		if ( nodo != null )
+		{
+			toStringRec ( nodo.getIzquierdo(), sb, nivel + 1 );
+			sb.append ("Sala ").append ( nodo.getDato().getId() )
+			  .append (": Valor(" ).append ( nodo.getDato().getValor() ).append (") " )
+			  .append ("[Nivel " ).append ( nivel ).append ("]\n" );
+			toStringRec ( nodo.getDerecho(), sb, nivel + 1 );
+		}
+	}
 
 }
