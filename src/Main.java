@@ -1,7 +1,8 @@
 import mazmorra.Arbol;
 import mazmorra.ArbolBinarioBusqueda;
 import utilidades.Utilidades;
-
+import mazmorra.NodoArbolBinarioBusqueda;
+import mazmorra.Sala;
 
 public class Main
 {
@@ -20,5 +21,17 @@ public class Main
         System.out.println("Arbol de mazmorras\n" + arbolBinarios[1].toString() );
         arbolBinarios[0].mostrar2D();
         arbolBinarios[1].mostrar2D();
+        final ArbolBinarioBusqueda arbolBinario2 = new ArbolBinarioBusqueda ();
+        final int [] claves = { 8, 20, 13, 5, 2, 15, 10, 7, 11, 9, 6, 12 };
+        for ( int i = 0; i < claves.length; i++ )
+        {
+            arbolBinario2.insertar ( claves[i], new Sala() );
+            arbolBinario2.mostrar2D();
+            System.out.println(arbolBinario2.toString());
+
+        }
+        arbolBinario2.borrar ( 5 );
+        arbolBinario2.mostrar2D();
+        System.out.println ( arbolBinario2.toString () );
     }
 }

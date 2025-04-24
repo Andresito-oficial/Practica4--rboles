@@ -89,26 +89,35 @@ public class ArbolBinarioBusqueda
 
 	private NodoArbolBinarioBusqueda reequilibrar ( NodoArbolBinarioBusqueda nodo )
 	{
-		final NodoArbolBinarioBusqueda nodoIzq = nodo.getIzquierdo();
-		final NodoArbolBinarioBusqueda nodoDer = nodo.getDerecho();
+		/*System.out.println( "Reequilibrando el nodo con clave " + nodo.getClave() );
+		this.mostrar2D();*/
+		NodoArbolBinarioBusqueda nodoIzq = nodo.getIzquierdo();
+		NodoArbolBinarioBusqueda nodoDer = nodo.getDerecho();
 		int aIzq = NodoArbolBinarioBusqueda.getAltura( nodoIzq );
 		final int aDer = NodoArbolBinarioBusqueda.getAltura( nodoDer );
-		
+		//System.out.println( "Altura izquierda: " + aIzq + " Altura derecha: " + aDer );
 		if ( aIzq > aDer + 1 )
 		{  // Rotar derecha
+			if ( NodoArbolBinarioBusqueda.getAltura ( nodoIzq.getDerecho () ) > NodoArbolBinarioBusqueda.getAltura ( nodoIzq.getIzquierdo () ) )
+			{
+				nodoIzq = rotarIzquierda ( nodoIzq );
+				nodoIzq.recalcularAltura();
+			}
 			nodo = rotarDerecha( nodo );
+			
 		}
 		else if ( aDer > aIzq + 1 || nodoIzq == null && nodoDer != null )
 		{  // Rotar izquierda
+			if ( NodoArbolBinarioBusqueda.getAltura( nodoDer.getIzquierdo () ) > NodoArbolBinarioBusqueda.getAltura ( nodoDer.getDerecho () ) )
+			{
+				nodoDer = rotarDerecha ( nodoDer );
+				nodoDer.recalcularAltura();
+			}
 			nodo = rotarIzquierda( nodo );
 		}
 		nodo.recalcularAltura();
 
-		/*
-		 * if ( nodoDer != null && nodoIzq == null ) nodo.setIzquierdo ( rotarIzquierda ( nodo ) );
-		 * else if ( aIzq > aDer + 1 ) nodo = rotarDerecha ( nodo );
-		 * else if ( aDer > aIzq + 1 ) nodo = rotarIzquierda ( nodo );
-		 */
+		//this.mostrar2D();
 		return nodo;
 	}
 
@@ -130,11 +139,13 @@ public class ArbolBinarioBusqueda
 		{  // Subarbol izquierdo
 			NodoArbolBinarioBusqueda nuevoIzq = this.borrarRec ( nodo.getIzquierdo (), clave );
 			nodo.setIzquierdo ( nuevoIzq );
+			//System.out.println( nodo.getIzquierdo() );
 		}
 		else if ( nodo.getClave () < clave )
 		{  // Subarbol derecho
 			NodoArbolBinarioBusqueda nuevoDer = this.borrarRec ( nodo.getDerecho (), clave );
 			nodo.setDerecho ( nuevoDer );
+			//System.out.println( nodo.getDerecho() );
 		}
 		else
 		{  // Borrar elemento en nodo
@@ -146,35 +157,45 @@ public class ArbolBinarioBusqueda
 			{  // Caso 2
 				nodo = nodo.getIzquierdo ();
 			}
-			else if ( nodo.getIzquierdo () == null )
-			{  // Caso 2
-				nodo = nodo.getDerecho ();
-			}
 			else
 			{    // Caso 3
-				NodoArbolBinarioBusqueda nuevoIzq = this.cambiarPorMenor ( nodo,
-						nodo.getIzquierdo () );
-				nodo.setIzquierdo ( nuevoIzq );
+				NodoArbolBinarioBusqueda nuevoDer = this.cambiarPorMenor ( nodo,
+						nodo.getDerecho () );
+				nodo.setDerecho ( nuevoDer );
+				//nodo.setIzquierdo ( nuevoIzq );
+				//System.out.println( nodo.getIzquierdo() );
 			}
 			numElementos--;
 		}
-		return nodo;
+		return switch ( nodo )
+		{
+			case null -> null;
+			default -> reequilibrar ( nodo );
+		};
 	}
 
+	/*private NodoArbolBinarioBusqueda cambiarPorMenor ( NodoArbolBinarioBusqueda nodoBorrar, NodoArbolBinarioBusqueda nodoMenor )
+	{
+
+	}	*/
 	private NodoArbolBinarioBusqueda cambiarPorMenor ( NodoArbolBinarioBusqueda nodoBorrar, NodoArbolBinarioBusqueda nodoMenor )
 	{
-		if ( nodoMenor.getDerecho () != null )
-		{   // Subárbol derecho
-			NodoArbolBinarioBusqueda nuevoDer = this.cambiarPorMenor ( nodoBorrar, nodoMenor.getDerecho () );
-			nodoMenor.setDerecho ( nuevoDer );
-			return nodoMenor;
-		}
-		else
-		{  // Encontrado nodo menor inmediato
+		if ( nodoMenor.getIzquierdo () == null )
+		{
 			nodoBorrar.setClave ( nodoMenor.getClave () ); // Cambiar datos
 			nodoBorrar.setDato ( nodoMenor.getDato () );
-			return nodoMenor.getIzquierdo ();
-			// Devolver subarbol izquierdo de menor inmediato
+			/*System.out.println( "voy a reequilibrar el nodo con clave " + nodoMenor.getClave() );
+			System.out.println( nodoMenor + " " + nodoMenor.getClave() ); */
+			nodoMenor = null;
+			return nodoMenor; 
+		}
+		else
+		{
+			NodoArbolBinarioBusqueda nuevoIzq = this.cambiarPorMenor ( nodoBorrar, nodoMenor.getIzquierdo () );
+			nodoMenor.setIzquierdo ( nuevoIzq );
+			//System.out.println( nodoMenor  + " " + nodoMenor.getClave() );
+			nodoMenor = reequilibrar ( nodoMenor );
+			return nodoMenor;
 		}
 	}
 
@@ -249,7 +270,7 @@ public class ArbolBinarioBusqueda
 			toStringRec ( nodo.getIzquierdo(), sb, nivel + 1 );
 			sb.append ("Sala ").append ( nodo.getDato().getId() )
 			  .append (": Valor(" ).append ( nodo.getClave() ).append (") " )
-			  .append ("[Nivel " ).append ( nivel ).append ("]\n" );
+			  .append ("[Nivel " ).append ( nivel ).append ("]" ).append ( " Altura: " + nodo.getAltura () + "\n" );
 			toStringRec ( nodo.getDerecho(), sb, nivel + 1 );
 		}
 	}
@@ -306,6 +327,14 @@ public class ArbolBinarioBusqueda
 				}
 				else
 				{
+					if ( n < altura )
+					{
+						for ( int i = 0; i < 2; i++ )
+						{
+							cola.add ( nulo );
+							colaNiveles.add ( n + 1 );	
+						}
+					}
 					System.out.printf("%-" + nEspacios + "s", " " );
 				}
 				
@@ -319,6 +348,20 @@ public class ArbolBinarioBusqueda
 	 */
 	public ArbolBinarioBusqueda[] partir ( int clave )
 	{
+		/*
+		 * Partir el árbol en dos subárboles, uno con los elementos menores o iguales a la clave
+		 * y otro con los elementos mayores a la clave.
+		 * El método devuelve un array de dos elementos, el primero con el subárbol menor o igual
+		 * y el segundo con el subárbol mayor.
+		 * Si el árbol está vacío, se devuelve null.
+		 * Si la clave es mayor que la mayor clave del árbol, se devuelve un array con el
+		 * árbol original en la primera posición y un árbol vacío en la segunda.
+		 * Si la clave es menor que la menor clave del árbol, se devuelve un array con un
+		 * árbol vacío en la primera posición y el árbol original en la segunda.
+		 * Si la clave está entre la menor y la mayor clave del árbol, se devuelve un array con
+		 * el subárbol menor o igual a la clave en la primera posición y el subárbol mayor en
+		 * la segunda.
+		 */
 		final ArbolBinarioBusqueda[] resultado = new ArbolBinarioBusqueda[2];
 		resultado[0] = new ArbolBinarioBusqueda ();
 		resultado[1] = new ArbolBinarioBusqueda ();
@@ -337,9 +380,15 @@ public class ArbolBinarioBusqueda
 
 	private void partirRec ( NodoArbolBinarioBusqueda nodo, int clave, ArbolBinarioBusqueda[] resultado )
 	{
+		/*
+		 * Si el nodo es nulo, no se hace nada.
+		 * Si la clave del nodo es menor o igual a la clave, se inserta en el subárbol de la primera posición del array.
+		 * Si la clave del nodo es mayor que la clave, se inserta en el subárbol de la segunda posición del array.
+		 * Se llama recursivamente a la función para los subárboles izquierdo y derecho.
+		 */
 		if ( nodo != null )
 		{
-			if ( nodo.getClave () < clave )
+			if ( nodo.getClave () <= clave )
 			{
 				resultado[0].insertar ( nodo.getClave (), nodo.getDato () );
 				
