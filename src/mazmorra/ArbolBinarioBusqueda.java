@@ -320,17 +320,6 @@ public class ArbolBinarioBusqueda
 	public ArbolBinarioBusqueda[] partir ( int clave )
 	{
 		final ArbolBinarioBusqueda[] resultado = new ArbolBinarioBusqueda[2];
-		/* final Sala corte = this.getElementoRec ( raiz, clave );
-		final NodoArbolBinarioBusqueda nodo = new NodoArbolBinarioBusqueda ( clave, corte );
-		if ( nodo != null )
-		{
-			resultado[0] = new ArbolBinarioBusqueda ();
-			resultado[1] = new ArbolBinarioBusqueda ();
-			resultado[0].raiz = nodo.getIzquierdo ();
-			resultado[1].raiz = nodo.getDerecho ();
-			resultado[0].numElementos = this.numElementos;
-			resultado[1].numElementos = this.numElementos;
-		} */
 		resultado[0] = new ArbolBinarioBusqueda ();
 		resultado[1] = new ArbolBinarioBusqueda ();
 		if ( raiz != null )
