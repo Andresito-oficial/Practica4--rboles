@@ -403,5 +403,47 @@ public class ArbolBinarioBusqueda
 		}
 	}
 
+	public ArbolBinarioBusqueda[] partir2 ( int clave )
+	{
+        if ( this.raiz == null )
+		{
+            // Caso base: si el árbol está vacío, devuelve dos árboles vacíos
+            return new ArbolBinarioBusqueda[] { new ArbolBinarioBusqueda(), new ArbolBinarioBusqueda() };
+        }
+
+        // Creación de dos nuevos árboles binarios de búsqueda
+        ArbolBinarioBusqueda arbolMenorOIgual = new ArbolBinarioBusqueda ();
+        ArbolBinarioBusqueda arbolMayor = new ArbolBinarioBusqueda  ();
+
+        // Partición del árbol
+        partirRecursivo ( this.raiz, clave, arbolMenorOIgual, arbolMayor );
+
+        return new ArbolBinarioBusqueda[] { arbolMenorOIgual, arbolMayor };
+    }
+	private void partirRecursivo ( NodoArbolBinarioBusqueda nodo, int clave, 
+                                 ArbolBinarioBusqueda arbolMenorOIgual, ArbolBinarioBusqueda arbolMayor )
+	{
+        if ( nodo == null )
+		{
+            return; // Caso base: nodo nulo
+        }
+
+        if ( nodo.getClave() <= clave )
+		{
+            // Agrega el nodo al árbol de menores o iguales
+            arbolMenorOIgual.insertar ( nodo.getClave(), nodo.getDato() );
+            // Continúa la partición con el subárbol derecho
+            partirRecursivo ( nodo.getDerecho() , clave, arbolMenorOIgual, arbolMayor );
+			partirRecursivo ( nodo.getIzquierdo(), clave, arbolMenorOIgual, arbolMayor );
+        }
+		else
+		{
+            // Agrega el nodo al árbol de mayores
+            arbolMayor.insertar ( nodo.getClave(), nodo.getDato() );
+            // Continúa la partición con el subárbol izquierdo
+            partirRecursivo ( nodo.getIzquierdo(), clave, arbolMenorOIgual, arbolMayor );
+			partirRecursivo ( nodo.getDerecho(), clave, arbolMenorOIgual, arbolMayor );
+        }
+    }
 
 }
